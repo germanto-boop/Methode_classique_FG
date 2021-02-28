@@ -3,7 +3,7 @@ import cv2 as cv
 from matplotlib import pyplot as plt
 
 """
-    _ Classe Algorihtme blablabla
+    _ Classe Algorihtme blabla
 
 """
 
