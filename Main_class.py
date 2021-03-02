@@ -9,7 +9,7 @@ import matplotlib.gridspec as gridspec
 """
 
 nb_algo = 4
-f, axarr = plt.subplots(nb_algo,2)
+f, axarr = plt.subplots(nb_algo,2,figsize=(12, 8))
 class Algorithme :
 
     test_realise = 1 
@@ -238,4 +238,16 @@ tHSV = Algo_HSV("data/J+12_PM_GA.jpg",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING
 tSeuil = Algo_Seuil("data/J+12_PM_GA.jpg",120)
 tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
 tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
+
+
+cols = ['Column {}'.format(col) for col in range(1, 4)]
+rows = ['Row {}'.format(row) for row in ['A', 'B', 'C', 'D']]
+
+for ax, col in zip(axarr[0], cols):
+    ax.set_title(col)
+
+for ax, row in zip(axarr[:,0], rows):
+    ax.set_ylabel(row, rotation=0, size='large')
+
+f.tight_layout()
 plt.show()
