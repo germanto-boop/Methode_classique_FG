@@ -246,12 +246,14 @@ tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil
 tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
 
 cols = ['Image initiale', 'Image finale']
-rows = ['{}'.format(row) for row in ['tHsv', 'tSeuil', 'tWaterSeuil', 'tWaterHSVÒ']]
+rows = ['tHsv','tHsv', 'tSeuil', 'tSeuil', 'tWaterSeuil', 'tWaterSeuil', 'tWaterHSV', 'tWaterHSV']
 
 
 for i, ax in enumerate(axarr.ravel()): 
-    ax.set_title("Plot #{}".format(i)) 
-
+    if(i % 2) == 0:
+        ax.set_title("Image Initiale - {}".format(rows[i]))
+    else:
+        ax.set_title("Image Finale - {}".format(rows[i]))
 
 f.subplots_adjust(left=0.125, bottom=0.11, right=0.62, top=0.936, wspace=0.127, hspace=0.34)
 
