@@ -12,9 +12,10 @@ class Algorithme :
     test_realise = 1
 
     def __init__(self,img) :
-        #self.image = cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB) #Sans masque manuel
-        self.image =  self.Manual_Mask(cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB))
-        self.image_init = self.Manual_Mask(cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB))
+        self.image = cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB) #Sans masque manuel
+        self.image_init = cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB)
+        # self.image =  self.Manual_Mask(cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB))
+        # self.image_init = self.Manual_Mask(cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB))
 
     """
         _ La méthode Affiche() permet d'afficher horizontalement les images entrees en parametre sur une seule figure
@@ -119,7 +120,12 @@ class Algo_Watershed(Algorithme) :
         # Algorithme.Affiche(localVar,imgToFlood,color="gray")
         # Algorithme.Affiche(localVar,background,foreground,unknown,color="gray")
         # Algorithme.Affiche(localVar,marqueurs,watershed)
-        Algorithme.Affiche(localVar,image_init,image_final, marche = True)     
+
+        #Algorithme.Affiche(localVar,image_init,image_final, marche = False)
+        if(Algorithme.test_realise == 4):
+            Algorithme.Affiche(localVar,image_init,image_final, marche = True)     
+        else:
+            Algorithme.Affiche(localVar,image_init,image_final, marche = False)
 
 """
     _ Classe seuillage espace HSV
@@ -137,7 +143,7 @@ class Algo_HSV(Algorithme) :
         self.comptagePixels(self.image)
         Algorithme.test_realise += 1    
 
-    def config_HSV(self) :
+    def config_HSV(self, only = True) :
         #variables locales
         image_init = self.image_init
         image_final = self.image
@@ -158,11 +164,15 @@ class Algo_HSV(Algorithme) :
         # Résultat
         image_final[opening == 0] = [255,0,0]
         # Affichage
-        localVar = locals().items() # Liste des varibales locales de la méthode actuelle
+        # localVar = locals().items() # Liste des varibales locales de la méthode actuelle
         # Algorithme.Histogramme(localVar,(hue,0,50),(sat,0,255),marche=True)
         # Algorithme.Affiche(localVar,hue,sat,val,color="gray",marche=True)
         # Algorithme.Affiche(localVar,hsv_T,opening,color="gray")
-        Algorithme.Affiche(localVar,hsv_T,opening,color="gray",marche = True)
+        # Algorithme.Affiche(localVar,image_init,image_final,color="gray",marche = False)
+
+        if(only):
+            localVar = locals().items() # Liste des varibales locales de la méthode actuelle
+            Algorithme.Affiche(localVar,self.image_init,image_final,color="gray",marche = False) 
         return opening
         
 class Algo_Seuil(Algorithme) :
@@ -170,68 +180,13 @@ class Algo_Seuil(Algorithme) :
     def __init__(self,img,s) :
         Algorithme.__init__(self,img)
         self.seuil = s
-        self.config_Seuil()
+        self.config_Seuil(self)
         self.comptagePixels(self.image)
         #self.bht(self,hist, min_count)
         Algorithme.test_realise += 1    
 
-    #seuil automatique par la méthode BHT.
-    def bht(self, hist, min_count: int = 5):
-        """Balanced histogram thresholding."""
-        n_bins = len(hist)
-        h_s = 0
-
-        #Tant que la valeur de teinte est inférieur à "min_count", h_s + 1 -> Cela donne la valeur de teinte partie inférieur.
-        while hist[h_s] < min_count:
-            h_s += 1
-        
-
-        #h_e = 255
-        h_e = n_bins - 1
-
-        #Tant que la valeur de teinte est inférieur à "min_count", h_e - 1 -> Cela donne la valeur de teinte partie supérieur.
-        while hist[h_e] < min_count:
-            h_e -= 1
-
-
-        #Création d'un tableau de dimension 1 pour stocker le contenu de l'histogramme.
-        table = np.zeros((256))
-        for i in range(256):
-            table[i] = hist[i][0]
-        
-        #Moyenne des valeurs inférieure et supérieure. - MÉTHODE 1
-        #h_c = (h_s + h_e) / 2
-
-        #Moyenne des valeurs inférieure et supérieure. - MÉTHODE 2
-        #Arrondie de la mise en moyenne du tableau pondéré par les valeurs de tables.
-        h_c = int(round(np.average(np.linspace(0, 2 ** 8 - 1, n_bins),weights=table)))
-
-        #Somme des poids de la partie de gauche jusqu'à la teinte inférieur et supérieur.
-        w_l = np.sum(hist[int(h_s):int(h_c)])
-        w_r = np.sum(hist[int(h_c): int(h_e + 1)])
-
-        while h_s < h_e:
-            if w_l > w_r:  # left part became heavier
-                w_l -= hist[h_s]
-                h_s += 1
-            else:  # right part became heavier
-                w_r -= hist[h_e]
-                h_e -= 1
-            new_c = int(round((h_e + h_s) / 2))  # re-center the weighing scale
-
-            if new_c < h_c:  # move bin to the other side
-                w_l -= hist[h_c]
-                w_r += hist[h_c]
-            elif new_c > h_c:
-                w_l += hist[h_c]
-                w_r -= hist[h_c]
-
-            h_c = new_c
-
-        return h_c
-
-    def config_Seuil(self) :
-        img = self.image #Commenter pour ne pas appliquer le masque manuel
+    def config_Seuil(self, only = True) :
+        image_final = self.image #Commenter pour ne pas appliquer le masque manuel
         image_init = self.image_init
 
         #test automatic threshold
@@ -247,72 +202,43 @@ class Algo_Seuil(Algorithme) :
         #Algorithme.Affiche(localVar,g,color="gray",marche = True) 
         
         #visualisation de l'histogramme du canal vert de l'image
-        color = ('b','g','r')
-        for i,col in enumerate(color):
-            histr = cv.calcHist([img],[i],None,[256],[0,256])
-            plt.plot(histr,color = col)
-            plt.xlim([0,256])
-        plt.axvline(101, color='orange') #afficher le treshold sur le graphe. 
-        plt.title("Histogramme N1_13_11_2020_PE0.png")
-        plt.show()
-        
-        
-
+        # color = ('b','g','r')
+        # for i,col in enumerate(color):
+        #     histr = cv.calcHist([img],[i],None,[256],[0,256])
+        #     plt.plot(histr,color = col)
+        #     plt.xlim([0,256])
+        # plt.axvline(101, color='orange') #afficher le treshold sur le graphe. 
+        # plt.title("Histogramme N1_13_11_2020_PE0.png")
+        # plt.show()
 
         #print(hist[0])
-        print(self.bht(hist, 50))
+        #print(self.bht(hist, 50))
         #print(type(hist[0]))
-        
 
-        
         #hist = cv.calcHist(image_init,[1],None,[256],[0,256])
 
-        self.seuil = 116
-
-        img[img[...,1]+100-img[...,0] < self.seuil] = [255,0,0] #Canal vert - Canal rouge et seuil à 120, fond mis à la couleur rouge.
-        image_init[image_init[...,1]+100-image_init[...,0] < self.seuil] = [255,0,0] #Canal vert - Canal rouge et seuil à 120, fond mis à la couleur rouge.
+        image_final[image_final[...,1]+100-image_final[...,0] < self.seuil] = [255,0,0] #Canal vert - Canal rouge et seuil à 120, fond mis à la couleur rouge.
 
         kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5)) #Construction de l'opérateur pour la morphologie Ellipse
-        opening = cv.morphologyEx(img[...,1].astype(np.uint8), cv.MORPH_OPEN, kernel) #Application d'une ouverture à l'image filtrée    
+        opening = cv.morphologyEx(image_final[...,1].astype(np.uint8), cv.MORPH_OPEN, kernel) #Application d'une ouverture à l'image filtrée    
         
-        img[opening == 0] = [255,0,0]
+        image_final[opening == 0] = [255,0,0]
         
-        
-        #localVar = locals().items() # Liste des varibales locales de la méthode actuelle
-        #Algorithme.Affiche(localVar,img,color="gray",marche = True) 
+        if(only):
+            localVar = locals().items() # Liste des varibales locales de la méthode actuelle
+            Algorithme.Affiche(localVar,image_init,image_final,color="gray",marche = False) 
+
         return opening
 
-
+#parameters
 SEUIL_MIN_HSV = [70/2,120,0],
 SEUIL_MAX_HSV = [90/2,255,255]
-TAILLE_OPENING = (12,12)
-#Test1 = Algo_HSV("N1_13_11_2020_PE0.png",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
-#Test2 = Algo_Seuil("N1_13_11_2020_PE0.png",120) #116
-
-Test2 = Algo_Seuil("N1_13_11_2020_PE0.png", 139)
-
-#Test2 = Algo_Seuil("Stade_12_1.10.png",120)
-
-
-#TAILLE_FG = (5,5) 
-#Test3 = Algo_Watershed("N1_13_11_2020_PE0.png",TAILLE_FG,Test2.config_Seuil())
-#Test3 = Algo_Watershed("N1_13_11_2020_PE0.png",TAILLE_FG,Test1.config_HSV())
-
-
-
-
-"""
+TAILLE_OPENING = (5,5)
 TAILLE_FG = (5,5) 
-Test2 = Algo_Watershed("N1_13_11_2020_PE0.png",TAILLE_OPENING,Test1.config_HSV())
 
-Test25 = Algo_Watershed("Stade_12_1.10.png",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
-SEUIL_MIN_HSV = [74/2,90,0]
-SEUIL_MAX_HSV = [100/2,255,255]
-TAILLE_OPENING = (5,5) # nettoyage
-TAILLE_FG = (10,10)
-Test3 = Algo_HSV("Stade_13_1.10.png",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
 
-SEUIL_MIN_HSV = [74/2,30,0]
-SEUIL_MAX_HSV = [120/2,255,255]
-TAILLE_OPENING = (15,15) # nettoyage
-Test4 = Algo_HSV("cylindre.png",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)"""
+#tests
+tHSV = Algo_HSV("data/J+12_PM_GA.jpg",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
+tSeuil = Algo_Seuil("data/J+12_PM_GA.jpg",120)
+tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
+tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
