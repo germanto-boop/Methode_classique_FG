@@ -9,7 +9,8 @@ import matplotlib.gridspec as gridspec
 """
 
 nb_algo = 4
-f, axarr = plt.subplots(nb_algo,2,figsize=(12, 8))
+f, axarr = plt.subplots(nb_algo,2)
+
 class Algorithme :
 
     test_realise = 1 
@@ -33,6 +34,9 @@ class Algorithme :
         while n<=NBR_IMAGE :
             SB = 100 + NBR_IMAGE*10 + n
             axarr[Algorithme.test_realise-1,n-1].imshow(img[n-1])
+            []
+            
+
             n += 1
 
     """
@@ -233,21 +237,22 @@ SEUIL_MAX_HSV = [90/2,255,255]
 TAILLE_OPENING = (5,5)
 TAILLE_FG = (5,5) 
 
+
 #tests
+
 tHSV = Algo_HSV("data/J+12_PM_GA.jpg",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
 tSeuil = Algo_Seuil("data/J+12_PM_GA.jpg",120)
-tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
-tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
+tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
+tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
+
+cols = ['Image initiale', 'Image finale']
+rows = ['{}'.format(row) for row in ['tHsv', 'tSeuil', 'tWaterSeuil', 'tWaterHSVÒ']]
 
 
-cols = ['Column {}'.format(col) for col in range(1, 4)]
-rows = ['Row {}'.format(row) for row in ['A', 'B', 'C', 'D']]
+for i, ax in enumerate(axarr.ravel()): 
+    ax.set_title("Plot #{}".format(i)) 
 
-for ax, col in zip(axarr[0], cols):
-    ax.set_title(col)
 
-for ax, row in zip(axarr[:,0], rows):
-    ax.set_ylabel(row, rotation=0, size='large')
+f.subplots_adjust(left=0.125, bottom=0.11, right=0.62, top=0.936, wspace=0.127, hspace=0.34)
 
-f.tight_layout()
 plt.show()
