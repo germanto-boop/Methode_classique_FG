@@ -1,15 +1,20 @@
 import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
+import matplotlib.gridspec as gridspec
 
 """
     _ Classe Algorihtme blablabla
 
 """
+fig2 = plt.figure(constrained_layout=True)
+spec2 = gridspec.GridSpec(ncols=4, nrows=4, figure=fig2)  
+
 
 class Algorithme :
 
-    test_realise = 1
+    test_realise = 1 
+
 
     def __init__(self,img) :
         self.image = cv.cvtColor(cv.imread(img),cv.COLOR_BGR2RGB) #Sans masque manuel
@@ -31,6 +36,7 @@ class Algorithme :
             SB = 100 + NBR_IMAGE*10 + n
             plt.subplot(SB)
             plt.imshow(img[n-1],color)
+            fig2.add_subplot(spec2[Algorithme.test_realise, n])
             for name,value in localVar :
                 if value is img[n-1] :
                     plt.title(name)
@@ -236,9 +242,15 @@ SEUIL_MAX_HSV = [90/2,255,255]
 TAILLE_OPENING = (5,5)
 TAILLE_FG = (5,5) 
 
-
+# fig2 = plt.figure(constrained_layout=True)
+# spec2 = gridspec.GridSpec(ncols=2, nrows=2, figure=fig2)
+# fig2.add_subplot(spec2[0, 0])
+# fig2.add_subplot(spec2[0, 1])
+# fig2.add_subplot(spec2[1, 0])
+# fig2.add_subplot(spec2[1, 1])
+# plt.show()
 #tests
-tHSV = Algo_HSV("data/J+12_PM_GA.jpg",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
-tSeuil = Algo_Seuil("data/J+12_PM_GA.jpg",120)
-tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
-tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
+# tHSV = Algo_HSV("data/J+12_PM_GA.jpg",SEUIL_MIN_HSV,SEUIL_MAX_HSV,TAILLE_OPENING)
+tSeuil = Algo_Seuil("data/J+12_PM_GA.jpg",120).config_Seuil(False)
+# tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
+# tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
