@@ -4,6 +4,6 @@ Codes de la méthode classique. Envisagée dans l'étude de faisabilité dans le
 
 ## TODO
 
-- [ ] Mettre code en mode prêt pour démonstration
+- [x] Mettre code en mode prêt pour démonstration
 - [ ] Mise au propre / ajout commentaires
 - [ ] Modularisé les classes
