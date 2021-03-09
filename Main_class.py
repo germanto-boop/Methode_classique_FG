@@ -243,4 +243,3 @@ tSeuil = Algo_Seuil("data/J+12_PM_GA.jpg",120)
 tWaterHSV = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tSeuil.config_Seuil(False))
 tWaterSeuil = Algo_Watershed("data/J+12_PM_GA.jpg",TAILLE_FG,tHSV.config_HSV(False))
 
-print("tttttttttttttttttttttttttttttttttttttttttttttttttttttt")
